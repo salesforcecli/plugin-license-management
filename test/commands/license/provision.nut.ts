@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { execCmd, TestSession } from '@salesforce/cli-plugins-testkit';
 import { expect } from 'chai';
-import { HelloWorldResult } from '../../../src/commands/hello/world.js';
 
-let testSession: TestSession;
+describe('license provision NUTs', () => {
+  let session: TestSession;
 
-describe('hello world NUTs', () => {
-  before('prepare session', async () => {
-    testSession = await TestSession.create();
+  before(async () => {
+    session = await TestSession.create({ devhubAuthStrategy: 'NONE' });
   });
 
   after(async () => {
-    await testSession?.clean();
+    await session?.clean();
   });
 
-  it('should say hello to the world', () => {
-    const result = execCmd<HelloWorldResult>('hello world --json', { ensureExitCode: 0 }).jsonOutput?.result;
-    expect(result?.name).to.equal('World');
-  });
-
-  it('should say hello to a given person', () => {
-    const result = execCmd<HelloWorldResult>('hello world --name Astro --json', {
-      ensureExitCode: 0,
-    }).jsonOutput?.result;
-    expect(result?.name).to.equal('Astro');
+  it('should display provided name', () => {
+    const name = 'license provision ';
+    const command = 'license provision --help';
+    const output = execCmd(command, { ensureExitCode: 0 }).shellOutput.stdout;
+    expect(output).to.contain(name);
   });
 });

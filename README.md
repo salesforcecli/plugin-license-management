@@ -91,7 +91,7 @@ To use your plugin, run using the local `./bin/dev` or `./bin/dev.cmd` file.
 
 ```bash
 # Run using local run file.
-./bin/dev hello world
+./bin/dev license provision
 ```
 
 There should be no differences when running via the Salesforce CLI or using the local run file. However, it can be useful to link the plugin to do some additional testing or run your commands from anywhere on your machine.
@@ -107,43 +107,84 @@ sf plugins
 
 <!-- commands -->
 
-- [`sf hello world`](#sf-hello-world)
+- [`sf license provision`](#sf-license-provision)
 
-## `sf hello world`
+## `sf license provision`
 
-Say hello.
+Provision Permission Set Licenses (PSL) into a target org.
 
 ```
 USAGE
-  $ sf hello world [--json] [--flags-dir <value>] [-n <value>]
+  $ sf license provision -o <value> [-n <value>] [-l <value>] [-q <value>] [-s <value>] [-e <value>] [-f <value>] [--api-version <value>] [--json] [--flags-dir <value>]
 
 FLAGS
-  -n, --name=<value>  [default: World] The name of the person you'd like to say hello to.
+  -e, --end-date=<value>         License end date in YYYY-MM-DD format. Default is no expiration.
+  -f, --definition-file=<value>  Path to a JSON file that contains the PSL provisioning request information.
+  -l, --license=<value>          Permission Set License name.
+  -n, --namespace=<value>        License package namespace.
+  -o, --target-org=<value>       (required) Username or alias of the target org.
+  -q, --quantity=<value>         Number of licenses to provision.
+  -s, --start-date=<value>       License start date in YYYY-MM-DD format. Defaults to today.
+      --api-version=<value>      Override the api version used for api requests made by this command.
 
 GLOBAL FLAGS
   --flags-dir=<value>  Import flag values from a directory.
   --json               Format output as json.
 
 DESCRIPTION
-  Say hello.
+  Provision Permission Set Licenses (PSL) into the target org. Successful execution sets the quantity of seats for the given PSL in the indicated org.
 
-  Say hello either to the world or someone you know.
+  There are two ways to run this command. You can provide the information to identify a single PSL via command line flags, or provision multiple PSLs in a single call by supplying a JSON formatted file.
+
+  See <Add URL Here> for the format and options contained within the JSON file.
 
 EXAMPLES
-  Say hello to the world:
+  Provision a single Permission Set License into an org:
 
-    $ sf hello world
+    $ sf license provision --target-org myScratchOrg --namespace demo --license newLicense --quantity 5 --start-date '2026-03-30' --end-date '2027-03-30'
 
-  Say hello to someone you know:
+  Use a JSON formatted input file to provision one or more Permission Set Licenses into an org:
 
-    $ sf hello world --name Astro
+    $ sf license provision --target-org myScratchOrg --definition-file test/config/provisionPSLs.json
 
-FLAG DESCRIPTIONS
-  -n, --name=<value>  The name of the person you'd like to say hello to.
+HUMAN READABLE OUTPUT
 
-    This person can be anyone in the world!
+  Success:
+  Provisioned 5 licenses for the license definition 'demo__newLicense'
+
+  Success:
+  Provisioned 5 licenses for the license definition 'demo__newLicense'
+  Provisioned 8 licenses for the license definition 'demo__premiumLicense'
+
+  Error: Failed to provision licenses.
+  License Definition not found for 'demo__badLicense'.
+  Quantity cannot be negative for 'demo__negativeLicense'.
+
+JSON OUTPUT
+
+  { "status": "success" }
+
+  {
+    "status": "error",
+    "messages": [
+      { "errorCode": "INVALID_LICENSE_DEFINITION", "message": "License definition not found for 'demo__badLicense'" },
+      { "errorCode": "INVALID_QUANTITY", "message": "Quantity cannot be negative for 'demo__negativeLicense'" }
+    ]
+  }
 ```
 
-_See code: [src/commands/hello/world.ts](https://github.com/salesforcecli/plugin-license-management/blob/1.1.84/src/commands/hello/world.ts)_
+_See code: [src/commands/license/provision.ts](https://github.com/salesforcecli/plugin-license-management/blob/1.0.0/src/commands/license/provision.ts)_
 
 <!-- commandsstop -->
+
+# Local Testing
+
+```bash
+sf org create scratch --target-dev-hub <devhub-alias> --definition-file test/config/scratch-org-def.json
+
+sf package install --package <package-id> --target-org <scratch-org-username>
+
+sf package install report -i <install-request-id> -o <scratch-org-username>
+
+sf license provision -o <scratch-org-username> --license premium --namespace demo --quantity 10 --start-date '2026-03-20' --end-date '2027-03-20'
+```

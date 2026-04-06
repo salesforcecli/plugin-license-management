@@ -1,10 +1,21 @@
 [
   {
     "alias": [],
-    "command": "hello:world",
-    "flagAliases": [],
-    "flagChars": ["n"],
-    "flags": ["flags-dir", "json", "name"],
+    "command": "license:provision",
+    "flagAliases": ["apiversion", "targetusername", "u"],
+    "flagChars": ["e", "f", "l", "n", "o", "q", "s"],
+    "flags": [
+      "api-version",
+      "definition-file",
+      "end-date",
+      "flags-dir",
+      "json",
+      "license",
+      "namespace",
+      "quantity",
+      "start-date",
+      "target-org"
+    ],
     "plugin": "@salesforce/plugin-license-management"
   }
 ]
