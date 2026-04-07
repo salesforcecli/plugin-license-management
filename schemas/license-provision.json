@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/LicenseProvisionResult",
+  "definitions": {
+    "LicenseProvisionResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "errorCode": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": ["errorCode", "message"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": false
+    }
+  }
+}

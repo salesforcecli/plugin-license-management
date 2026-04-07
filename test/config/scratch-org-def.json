@@ -1,0 +1,11 @@
+{
+  "orgName": "PSL Test Scratch Org",
+  "edition": "enterprise",
+  "namespace": "demo",
+  "features": ["PartnerLicensingAndProvisioningPlatform"],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    }
+  }
+}
