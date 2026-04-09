@@ -21,8 +21,6 @@ import { Messages, SfError } from '@salesforce/core';
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('@salesforce/plugin-license-management', 'license.provision');
 
-const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-
 type ProvisionLicenseSpec = {
   namespacePrefix?: string;
   permissionSetLicense?: string;
@@ -35,32 +33,21 @@ type ProvisionPslRequest = {
   licenses: ProvisionLicenseSpec[];
 };
 
-type ProvisionErrorMessage = {
-  errorCode: string;
-  message: string;
-};
-
 type ProvisionPslResponse = {
   status: string;
   licensesProvisioned?: number;
   message?: string;
-  messages?: ProvisionErrorMessage[];
+  traceId?: string;
 };
 
 export type LicenseProvisionResult = {
   status: string;
-  messages?: ProvisionErrorMessage[];
+  traceId?: string;
 };
 
 function getLicenseDefinitionName(spec: ProvisionLicenseSpec): string {
   const psl = spec.permissionSetLicense ?? '';
   return spec.namespacePrefix ? `${spec.namespacePrefix}__${psl}` : psl;
-}
-
-function validateDate(dateStr: string, flagName: string): void {
-  if (!DATE_REGEX.test(dateStr)) {
-    throw messages.createError('error.invalidDateFormat', [dateStr, flagName]);
-  }
 }
 
 export default class LicenseProvision extends SfCommand<LicenseProvisionResult> {
@@ -153,11 +140,6 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
       ? await LicenseProvision.loadSpecsFromFile(flags['definition-file'], flags)
       : LicenseProvision.buildSpecsFromFlags(flags);
 
-    for (const spec of licenseSpecs) {
-      if (spec.startDate) validateDate(spec.startDate, 'start-date');
-      if (spec.endDate) validateDate(spec.endDate, 'end-date');
-    }
-
     const endpoint = `/services/data/v${connection.getApiVersion()}/partnerdevelopment/permissionsetlicenses`;
     const requestBody: ProvisionPslRequest = { licenses: licenseSpecs };
 
@@ -174,22 +156,28 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
     }
 
     if (response.status !== 'SUCCESS') {
-      const errorMessages: ProvisionErrorMessage[] =
-        response.messages ?? (response.message ? [{ errorCode: 'PROVISION_ERROR', message: response.message }] : []);
-
-      const errorDetail = errorMessages.map((m) => m.message).join('  ');
       throw SfError.create({
-        message: messages.getMessage('error.provisionFailed', [errorDetail]),
+        message: messages.getMessage('error.provisionFailed', [response.message ?? 'Unknown error']),
         name: 'PROVISION_FAILED',
-        data: { status: 'error', messages: errorMessages },
+        data: { traceId: response.traceId },
       });
     }
 
-    this.log(messages.getMessage('success'));
-    for (const spec of licenseSpecs) {
-      this.log(messages.getMessage('success.provisioned', [spec.quantity ?? 0, getLicenseDefinitionName(spec)]));
-    }
+    this.display(licenseSpecs, response);
 
-    return { status: 'success' };
+    return { status: 'success', traceId: response.traceId };
+  }
+
+  private display(licenseSpecs: ProvisionLicenseSpec[], response: ProvisionPslResponse): void {
+    this.table({
+      data: licenseSpecs.map((spec) => ({
+        [messages.getMessage('success.column.licenseDefinition')]: getLicenseDefinitionName(spec),
+        [messages.getMessage('success.column.provisionedQuantity')]: String(spec.quantity ?? 0),
+      })),
+      title: messages.getMessage('success'),
+    });
+    if (response.traceId) {
+      this.log(messages.getMessage('success.traceId', [response.traceId]));
+    }
   }
 }
