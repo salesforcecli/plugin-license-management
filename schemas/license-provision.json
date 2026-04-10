@@ -8,21 +8,8 @@
         "status": {
           "type": "string"
         },
-        "messages": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "errorCode": {
-                "type": "string"
-              },
-              "message": {
-                "type": "string"
-              }
-            },
-            "required": ["errorCode", "message"],
-            "additionalProperties": false
-          }
+        "traceId": {
+          "type": "string"
         }
       },
       "required": ["status"],

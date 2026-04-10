@@ -44,9 +44,9 @@ Path to a JSON file that contains the PSL provisioning request information.
 
   <%= config.bin %> <%= command.id %> --target-org myScratchOrg --definition-file test/config/provisionPSLs.json
 
-# success.provisioned
+# success.traceId
 
-Provisioned %s licenses for the license definition '%s'
+Trace ID: %s
 
 # error.missingLicenseFlag
 
@@ -60,10 +60,6 @@ The --definition-file flag cannot be used with --namespace, --license, --quantit
 
 The definition file must contain at least one license entry.
 
-# error.invalidDateFormat
-
-Invalid date format '%s' for --%s. Expected YYYY-MM-DD.
-
 # error.provisionFailed
 
 Failed to provision licenses. %s
@@ -71,3 +67,11 @@ Failed to provision licenses. %s
 # success
 
 Success:
+
+# success.column.licenseDefinition
+
+License Definition
+
+# success.column.provisionedQuantity
+
+Provisioned Quantity

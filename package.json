@@ -53,7 +53,7 @@
     ],
     "topics": {
       "license": {
-        "description": "description for license"
+        "description": "Commands to provision and manage Permission Set Licenses in a scratch org."
       }
     },
     "flexibleTaxonomy": true

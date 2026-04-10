@@ -23,7 +23,7 @@ import { stubSfCommandUx } from '@salesforce/sf-plugins-core';
 import { Connection, Org } from '@salesforce/core';
 import LicenseProvision from '../../../src/commands/license/provision.js';
 
-const SUCCESS_RESPONSE = { status: 'SUCCESS', licensesProvisioned: 5, message: 'OK' };
+const SUCCESS_RESPONSE = { status: 'SUCCESS', licensesProvisioned: 5, message: 'OK', traceId: 'tm_test123' };
 
 describe('license provision', () => {
   const $$ = new TestContext();
@@ -71,21 +71,22 @@ describe('license provision', () => {
       '2027-03-30',
     ]);
 
-    const output = sfCommandStubs.log
-      .getCalls()
-      .flatMap((c) => c.args)
-      .join('\n');
-    expect(output).to.equal("Success:\nProvisioned 5 licenses for the license definition 'demo__newLicense'");
+    const tableCall = sfCommandStubs.table.firstCall.args[0] as { data: Array<Record<string, string>>; title: string };
+    expect(tableCall.title).to.equal('Success:');
+    expect(tableCall.data).to.deep.include({ 'License Definition': 'demo__newLicense', 'Provisioned Quantity': '5' });
+    expect(
+      sfCommandStubs.log
+        .getCalls()
+        .flatMap((c) => c.args)
+        .join('\n')
+    ).to.include('Trace ID: tm_test123');
   });
 
   it('provisions a PSL without a namespace', async () => {
     await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'myLicense', '--quantity', '3']);
 
-    const output = sfCommandStubs.log
-      .getCalls()
-      .flatMap((c) => c.args)
-      .join('\n');
-    expect(output).to.include("Provisioned 3 licenses for the license definition 'myLicense'");
+    const tableCall = sfCommandStubs.table.firstCall.args[0] as { data: Array<Record<string, string>> };
+    expect(tableCall.data).to.deep.include({ 'License Definition': 'myLicense', 'Provisioned Quantity': '3' });
   });
 
   it('sends the correct POST request payload', async () => {
@@ -130,9 +131,9 @@ describe('license provision', () => {
     expect(body.licenses[0].startDate).to.equal(today);
   });
 
-  it('returns status:success result', async () => {
+  it('returns status:success result with traceId', async () => {
     const result = await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'myLicense']);
-    expect(result).to.deep.equal({ status: 'success' });
+    expect(result).to.deep.equal({ status: 'success', traceId: 'tm_test123' });
   });
 
   // ─── Success: definition file ────────────────────────────────────────────────
@@ -161,12 +162,22 @@ describe('license provision', () => {
 
       await LicenseProvision.run(['--target-org', testOrg.username, '--definition-file', tmpFilePath]);
 
-      const output = sfCommandStubs.log
-        .getCalls()
-        .flatMap((c) => c.args)
-        .join('\n');
-      expect(output).to.include("Provisioned 5 licenses for the license definition 'demo__newLicense'");
-      expect(output).to.include("Provisioned 8 licenses for the license definition 'demo__premiumLicense'");
+      const tableCall = sfCommandStubs.table.firstCall.args[0] as {
+        data: Array<Record<string, string>>;
+        title: string;
+      };
+      expect(tableCall.title).to.equal('Success:');
+      expect(tableCall.data).to.deep.include({ 'License Definition': 'demo__newLicense', 'Provisioned Quantity': '5' });
+      expect(tableCall.data).to.deep.include({
+        'License Definition': 'demo__premiumLicense',
+        'Provisioned Quantity': '8',
+      });
+      expect(
+        sfCommandStubs.log
+          .getCalls()
+          .flatMap((c) => c.args)
+          .join('\n')
+      ).to.include('Trace ID: tm_test123');
     });
 
     it('sends all PSLs from the definition file in a single request', async () => {
@@ -240,40 +251,6 @@ describe('license provision', () => {
     }
   });
 
-  it('throws for an invalid start-date format', async () => {
-    try {
-      await LicenseProvision.run([
-        '--target-org',
-        testOrg.username,
-        '--license',
-        'myLicense',
-        '--start-date',
-        '30-03-2026',
-      ]);
-      expect.fail('Expected an error to be thrown');
-    } catch (error: unknown) {
-      expect((error as Error).message).to.include('30-03-2026');
-      expect((error as Error).message).to.include('start-date');
-    }
-  });
-
-  it('throws for an invalid end-date format', async () => {
-    try {
-      await LicenseProvision.run([
-        '--target-org',
-        testOrg.username,
-        '--license',
-        'myLicense',
-        '--end-date',
-        'March 30 2027',
-      ]);
-      expect.fail('Expected an error to be thrown');
-    } catch (error: unknown) {
-      expect((error as Error).message).to.include('March 30 2027');
-      expect((error as Error).message).to.include('end-date');
-    }
-  });
-
   it('throws when definition file contains no license entries', async () => {
     const tmpFilePath = join(tmpdir(), `provision-empty-${Date.now()}.json`);
     await writeFile(tmpFilePath, JSON.stringify({ licenses: [] }));
@@ -289,56 +266,34 @@ describe('license provision', () => {
 
   // ─── API error responses ─────────────────────────────────────────────────────
 
-  it('throws with the server error message when status is error', async () => {
-    requestStub.resolves({
-      status: 'error',
-      messages: [
-        { errorCode: 'INVALID_LICENSE_DEFINITION', message: "License definition not found for 'demo__badLicense'" },
-      ],
-    });
-
-    try {
-      await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'badLicense', '--namespace', 'demo']);
-      expect.fail('Expected an error to be thrown');
-    } catch (error: unknown) {
-      expect((error as Error).message).to.include("License definition not found for 'demo__badLicense'");
-    }
-  });
-
-  it('includes all error messages when multiple PSLs fail', async () => {
-    requestStub.resolves({
-      status: 'error',
-      messages: [
-        { errorCode: 'INVALID_LICENSE_DEFINITION', message: "License definition not found for 'demo__badLicense'" },
-        { errorCode: 'INVALID_QUANTITY', message: "Quantity cannot be negative for 'demo__negativeLicense'" },
-      ],
-    });
-
-    const tmpFilePath = join(tmpdir(), `provision-multi-err-${Date.now()}.json`);
-    await writeFile(
-      tmpFilePath,
-      JSON.stringify({
-        licenses: [
-          { namespacePrefix: 'demo', permissionSetLicense: 'badLicense', quantity: 5 },
-          { namespacePrefix: 'demo', permissionSetLicense: 'negativeLicense', quantity: -1 },
-        ],
+  it('wraps a HTTP 400 provisioning error as SfError', async () => {
+    requestStub.rejects(
+      Object.assign(new Error("Invalid endDate format for permissionSetLicense 'premium'"), {
+        name: 'INVALID_END_DATE',
       })
     );
 
     try {
-      await LicenseProvision.run(['--target-org', testOrg.username, '--definition-file', tmpFilePath]);
+      await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'premium']);
       expect.fail('Expected an error to be thrown');
     } catch (error: unknown) {
-      const msg = (error as Error).message;
-      expect(msg).to.include("License definition not found for 'demo__badLicense'");
-      expect(msg).to.include("Quantity cannot be negative for 'demo__negativeLicense'");
-    } finally {
-      await unlink(tmpFilePath).catch(() => {});
+      expect((error as Error).message).to.include('Invalid endDate format');
     }
   });
 
-  it('falls back to the message field when messages array is absent', async () => {
-    requestStub.resolves({ status: 'error', message: 'An unexpected error occurred' });
+  it('throws with a generic message when non-SUCCESS response has no message', async () => {
+    requestStub.resolves({ status: 'ERROR' });
+
+    try {
+      await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'anyLicense']);
+      expect.fail('Expected an error to be thrown');
+    } catch (error: unknown) {
+      expect((error as Error).message).to.include('Unknown error');
+    }
+  });
+
+  it('falls back gracefully when non-200 response has no structured error body', async () => {
+    requestStub.resolves({ status: 'ERROR', message: 'An unexpected error occurred' });
 
     try {
       await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'anyLicense']);
