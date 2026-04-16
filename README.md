@@ -115,16 +115,14 @@ Provision Permission Set Licenses (PSL) into a target org.
 
 ```
 USAGE
-  $ sf license provision -o <value> [-n <value>] [-l <value>] [-q <value>] [-s <value>] [-e <value>] [-f <value>] [--api-version <value>] [--json] [--flags-dir <value>]
+  $ sf license provision -o <value> [-n <value>] [-l <value>] [-q <value>] [-f <value>] [--api-version <value>] [--json] [--flags-dir <value>]
 
 FLAGS
-  -e, --end-date=<value>         License end date in YYYY-MM-DD format. Default is no expiration.
   -f, --definition-file=<value>  Path to a JSON file that contains the PSL provisioning request information.
   -l, --license=<value>          Permission Set License name.
   -n, --namespace=<value>        License package namespace.
   -o, --target-org=<value>       (required) Username or alias of the target org.
   -q, --quantity=<value>         Number of licenses to provision.
-  -s, --start-date=<value>       License start date in YYYY-MM-DD format. Defaults to today.
       --api-version=<value>      Override the api version used for api requests made by this command.
 
 GLOBAL FLAGS
@@ -141,7 +139,7 @@ DESCRIPTION
 EXAMPLES
   Provision a single Permission Set License into an org:
 
-    $ sf license provision --target-org myScratchOrg --namespace demo --license newLicense --quantity 5 --start-date '2026-03-30' --end-date '2027-03-30'
+    $ sf license provision --target-org myScratchOrg --namespace demo --license newLicense --quantity 5
 
   Use a JSON formatted input file to provision one or more Permission Set Licenses into an org:
 
@@ -186,5 +184,5 @@ sf package install --package <package-id> --target-org <scratch-org-username>
 
 sf package install report -i <install-request-id> -o <scratch-org-username>
 
-sf license provision -o <scratch-org-username> --license premium --namespace demo --quantity 10 --start-date '2026-03-20' --end-date '2027-03-20'
+sf license provision -o <scratch-org-username> --license premium --namespace demo --quantity 10
 ```

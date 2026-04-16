@@ -25,8 +25,6 @@ type ProvisionLicenseSpec = {
   namespacePrefix?: string;
   permissionSetLicense?: string;
   quantity?: number;
-  startDate?: string;
-  endDate?: string;
 };
 
 type ProvisionPslRequest = {
@@ -72,14 +70,6 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
       min: 0,
       max: Number.MAX_SAFE_INTEGER,
     }),
-    'start-date': Flags.string({
-      char: 's',
-      summary: messages.getMessage('flags.start-date.summary'),
-    }),
-    'end-date': Flags.string({
-      char: 'e',
-      summary: messages.getMessage('flags.end-date.summary'),
-    }),
     'definition-file': Flags.string({
       char: 'f',
       summary: messages.getMessage('flags.definition-file.summary'),
@@ -92,13 +82,7 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     flags: Record<string, any>
   ): Promise<ProvisionLicenseSpec[]> {
-    if (
-      flags['license'] ||
-      flags['namespace'] ||
-      flags['quantity'] !== undefined ||
-      flags['start-date'] ||
-      flags['end-date']
-    ) {
+    if (flags['license'] || flags['namespace'] || flags['quantity'] !== undefined) {
       throw messages.createError('error.mutuallyExclusiveFlags');
     }
 
@@ -118,15 +102,11 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
       throw messages.createError('error.missingLicenseFlag');
     }
 
-    const startDate = (flags['start-date'] as string | undefined) ?? new Date().toISOString().slice(0, 10);
-
     return [
       {
         namespacePrefix: flags['namespace'] as string | undefined,
         permissionSetLicense: flags['license'] as string,
         quantity: flags['quantity'] as number | undefined,
-        startDate,
-        endDate: flags['end-date'] as string | undefined,
       },
     ];
   }

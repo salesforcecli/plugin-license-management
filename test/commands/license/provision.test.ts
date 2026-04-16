@@ -65,10 +65,6 @@ describe('license provision', () => {
       'demo',
       '--quantity',
       '5',
-      '--start-date',
-      '2026-03-30',
-      '--end-date',
-      '2027-03-30',
     ]);
 
     const tableCall = sfCommandStubs.table.firstCall.args[0] as { data: Array<Record<string, string>>; title: string };
@@ -99,10 +95,6 @@ describe('license provision', () => {
       'demo',
       '--quantity',
       '5',
-      '--start-date',
-      '2026-03-30',
-      '--end-date',
-      '2027-03-30',
     ]);
 
     expect(requestStub.calledOnce).to.be.true;
@@ -116,19 +108,7 @@ describe('license provision', () => {
       namespacePrefix: 'demo',
       permissionSetLicense: 'newLicense',
       quantity: 5,
-      startDate: '2026-03-30',
-      endDate: '2027-03-30',
     });
-  });
-
-  it('defaults start-date to today when not provided', async () => {
-    const today = new Date().toISOString().slice(0, 10);
-
-    await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'myLicense']);
-
-    const callArgs = requestStub.firstCall.args[0] as { body: string };
-    const body = JSON.parse(callArgs.body) as { licenses: Array<{ startDate: string }> };
-    expect(body.licenses[0].startDate).to.equal(today);
   });
 
   it('returns status:success result with traceId', async () => {
@@ -268,8 +248,8 @@ describe('license provision', () => {
 
   it('wraps a HTTP 400 provisioning error as SfError', async () => {
     requestStub.rejects(
-      Object.assign(new Error("Invalid endDate format for permissionSetLicense 'premium'"), {
-        name: 'INVALID_END_DATE',
+      Object.assign(new Error("Invalid quantity for permissionSetLicense 'premium'"), {
+        name: 'INVALID_QUANTITY',
       })
     );
 
@@ -277,7 +257,7 @@ describe('license provision', () => {
       await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'premium']);
       expect.fail('Expected an error to be thrown');
     } catch (error: unknown) {
-      expect((error as Error).message).to.include('Invalid endDate format');
+      expect((error as Error).message).to.include('Invalid quantity');
     }
   });
 
