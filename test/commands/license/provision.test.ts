@@ -78,11 +78,13 @@ describe('license provision', () => {
     ).to.include('Trace ID: tm_test123');
   });
 
-  it('provisions a PSL without a namespace', async () => {
-    await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'myLicense', '--quantity', '3']);
-
-    const tableCall = sfCommandStubs.table.firstCall.args[0] as { data: Array<Record<string, string>> };
-    expect(tableCall.data).to.deep.include({ 'License Definition': 'myLicense', 'Provisioned Quantity': '3' });
+  it('throws when --license is provided without --namespace or --quantity', async () => {
+    try {
+      await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'myLicense']);
+      expect.fail('Expected an error to be thrown');
+    } catch (error: unknown) {
+      expect((error as Error).message).to.include('--namespace');
+    }
   });
 
   it('sends the correct POST request payload', async () => {
@@ -112,7 +114,16 @@ describe('license provision', () => {
   });
 
   it('returns status:success result with traceId', async () => {
-    const result = await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'myLicense']);
+    const result = await LicenseProvision.run([
+      '--target-org',
+      testOrg.username,
+      '--license',
+      'myLicense',
+      '--namespace',
+      'demo',
+      '--quantity',
+      '5',
+    ]);
     expect(result).to.deep.equal({ status: 'success', traceId: 'tm_test123' });
   });
 
@@ -134,8 +145,8 @@ describe('license provision', () => {
         tmpFilePath,
         JSON.stringify({
           licenses: [
-            { namespacePrefix: 'demo', permissionSetLicense: 'newLicense', quantity: 5 },
-            { namespacePrefix: 'demo', permissionSetLicense: 'premiumLicense', quantity: 8 },
+            { namespace: 'demo', license: 'newLicense', quantity: 5 },
+            { namespace: 'demo', license: 'premiumLicense', quantity: 8 },
           ],
         })
       );
@@ -165,8 +176,8 @@ describe('license provision', () => {
         tmpFilePath,
         JSON.stringify({
           licenses: [
-            { namespacePrefix: 'ns1', permissionSetLicense: 'licA', quantity: 10 },
-            { namespacePrefix: 'ns2', permissionSetLicense: 'licB', quantity: 20 },
+            { namespace: 'ns1', license: 'licA', quantity: 10 },
+            { namespace: 'ns2', license: 'licB', quantity: 20 },
           ],
         })
       );
@@ -193,7 +204,7 @@ describe('license provision', () => {
 
   it('throws when --definition-file is combined with --license', async () => {
     const tmpFilePath = join(tmpdir(), `provision-excl-${Date.now()}.json`);
-    await writeFile(tmpFilePath, JSON.stringify({ licenses: [{ permissionSetLicense: 'lic', quantity: 1 }] }));
+    await writeFile(tmpFilePath, JSON.stringify({ licenses: [{ license: 'lic', quantity: 1 }] }));
     try {
       await LicenseProvision.run([
         '--target-org',
@@ -213,7 +224,7 @@ describe('license provision', () => {
 
   it('throws when --definition-file is combined with --quantity', async () => {
     const tmpFilePath = join(tmpdir(), `provision-excl-qty-${Date.now()}.json`);
-    await writeFile(tmpFilePath, JSON.stringify({ licenses: [{ permissionSetLicense: 'lic', quantity: 1 }] }));
+    await writeFile(tmpFilePath, JSON.stringify({ licenses: [{ license: 'lic', quantity: 1 }] }));
     try {
       await LicenseProvision.run([
         '--target-org',
@@ -244,6 +255,42 @@ describe('license provision', () => {
     }
   });
 
+  it('throws when definition file entry is missing required fields', async () => {
+    const tmpFilePath = join(tmpdir(), `provision-missing-${Date.now()}.json`);
+    await writeFile(
+      tmpFilePath,
+      JSON.stringify({
+        licenses: [{ namespace: 'demo', license: 'lic' }],
+      })
+    );
+    try {
+      await LicenseProvision.run(['--target-org', testOrg.username, '--definition-file', tmpFilePath]);
+      expect.fail('Expected an error to be thrown');
+    } catch (error: unknown) {
+      expect((error as Error).message).to.include('Missing required fields: licenses[0].quantity');
+    } finally {
+      await unlink(tmpFilePath).catch(() => {});
+    }
+  });
+
+  it('throws when definition file contains unknown fields', async () => {
+    const tmpFilePath = join(tmpdir(), `provision-unknown-${Date.now()}.json`);
+    await writeFile(
+      tmpFilePath,
+      JSON.stringify({
+        licenses: [{ namespace: 'demo', license: 'lic', quantity: 5, startDate: '2026-04-01', endDate: '2027-04-01' }],
+      })
+    );
+    try {
+      await LicenseProvision.run(['--target-org', testOrg.username, '--definition-file', tmpFilePath]);
+      expect.fail('Expected an error to be thrown');
+    } catch (error: unknown) {
+      expect((error as Error).message).to.include('Nonexistent fields: startDate, endDate');
+    } finally {
+      await unlink(tmpFilePath).catch(() => {});
+    }
+  });
+
   // ─── API error responses ─────────────────────────────────────────────────────
 
   it('wraps a HTTP 400 provisioning error as SfError', async () => {
@@ -254,7 +301,16 @@ describe('license provision', () => {
     );
 
     try {
-      await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'premium']);
+      await LicenseProvision.run([
+        '--target-org',
+        testOrg.username,
+        '--license',
+        'premium',
+        '--namespace',
+        'demo',
+        '--quantity',
+        '5',
+      ]);
       expect.fail('Expected an error to be thrown');
     } catch (error: unknown) {
       expect((error as Error).message).to.include('Invalid quantity');
@@ -265,7 +321,16 @@ describe('license provision', () => {
     requestStub.resolves({ status: 'ERROR' });
 
     try {
-      await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'anyLicense']);
+      await LicenseProvision.run([
+        '--target-org',
+        testOrg.username,
+        '--license',
+        'anyLicense',
+        '--namespace',
+        'demo',
+        '--quantity',
+        '5',
+      ]);
       expect.fail('Expected an error to be thrown');
     } catch (error: unknown) {
       expect((error as Error).message).to.include('Unknown error');
@@ -276,7 +341,16 @@ describe('license provision', () => {
     requestStub.resolves({ status: 'ERROR', message: 'An unexpected error occurred' });
 
     try {
-      await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'anyLicense']);
+      await LicenseProvision.run([
+        '--target-org',
+        testOrg.username,
+        '--license',
+        'anyLicense',
+        '--namespace',
+        'demo',
+        '--quantity',
+        '5',
+      ]);
       expect.fail('Expected an error to be thrown');
     } catch (error: unknown) {
       expect((error as Error).message).to.include('An unexpected error occurred');
@@ -287,7 +361,16 @@ describe('license provision', () => {
     requestStub.rejects(new Error('ECONNREFUSED'));
 
     try {
-      await LicenseProvision.run(['--target-org', testOrg.username, '--license', 'anyLicense']);
+      await LicenseProvision.run([
+        '--target-org',
+        testOrg.username,
+        '--license',
+        'anyLicense',
+        '--namespace',
+        'demo',
+        '--quantity',
+        '5',
+      ]);
       expect.fail('Expected an error to be thrown');
     } catch (error: unknown) {
       expect((error as Error).message).to.include('ECONNREFUSED');

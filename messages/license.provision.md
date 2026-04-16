@@ -44,13 +44,17 @@ Trace ID: %s
 
 Either --license or --definition-file is required.
 
-# error.mutuallyExclusiveFlags
-
-The --definition-file flag cannot be used with --namespace, --license, or --quantity.
-
 # error.emptyDefinitionFile
 
 The definition file must contain at least one license entry.
+
+# error.unsupportedDefinitionFileFields
+
+Nonexistent fields: %s
+
+# error.missingRequiredDefinitionFileFields
+
+Missing required fields: %s
 
 # error.provisionFailed
 

@@ -22,13 +22,23 @@ Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('@salesforce/plugin-license-management', 'license.provision');
 
 type ProvisionLicenseSpec = {
+  namespace?: string;
+  license?: string;
+  quantity?: number;
+};
+
+type ApiLicenseSpec = {
   namespacePrefix?: string;
   permissionSetLicense?: string;
   quantity?: number;
 };
 
-type ProvisionPslRequest = {
+type DefinitionFile = {
   licenses: ProvisionLicenseSpec[];
+};
+
+type ProvisionPslRequest = {
+  licenses: ApiLicenseSpec[];
 };
 
 type ProvisionPslResponse = {
@@ -44,8 +54,16 @@ export type LicenseProvisionResult = {
 };
 
 function getLicenseDefinitionName(spec: ProvisionLicenseSpec): string {
-  const psl = spec.permissionSetLicense ?? '';
-  return spec.namespacePrefix ? `${spec.namespacePrefix}__${psl}` : psl;
+  const psl = spec.license ?? '';
+  return spec.namespace ? `${spec.namespace}__${psl}` : psl;
+}
+
+function toApiSpec(spec: ProvisionLicenseSpec): ApiLicenseSpec {
+  return {
+    namespacePrefix: spec.namespace,
+    permissionSetLicense: spec.license,
+    quantity: spec.quantity,
+  };
 }
 
 export default class LicenseProvision extends SfCommand<LicenseProvisionResult> {
@@ -59,38 +77,55 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
     namespace: Flags.string({
       char: 'n',
       summary: messages.getMessage('flags.namespace.summary'),
+      dependsOn: ['license'],
+      exclusive: ['definition-file'],
     }),
     license: Flags.string({
       char: 'l',
       summary: messages.getMessage('flags.license.summary'),
+      exclusive: ['definition-file'],
+      relationships: [{ type: 'all', flags: ['namespace', 'quantity'] }],
     }),
     quantity: Flags.integer({
       char: 'q',
       summary: messages.getMessage('flags.quantity.summary'),
       min: 0,
       max: Number.MAX_SAFE_INTEGER,
+      dependsOn: ['license'],
+      exclusive: ['definition-file'],
     }),
     'definition-file': Flags.string({
       char: 'f',
       summary: messages.getMessage('flags.definition-file.summary'),
+      exclusive: ['license', 'namespace', 'quantity'],
     }),
   };
 
   // Protected to allow stubbing in tests
-  protected static async loadSpecsFromFile(
-    filePath: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    flags: Record<string, any>
-  ): Promise<ProvisionLicenseSpec[]> {
-    if (flags['license'] || flags['namespace'] || flags['quantity'] !== undefined) {
-      throw messages.createError('error.mutuallyExclusiveFlags');
-    }
-
+  protected static async loadSpecsFromFile(filePath: string): Promise<ProvisionLicenseSpec[]> {
     const fileContent = await readFile(filePath, 'utf-8');
-    const definition = JSON.parse(fileContent) as ProvisionPslRequest;
+    const definition = JSON.parse(fileContent) as DefinitionFile;
 
     if (!Array.isArray(definition.licenses) || definition.licenses.length === 0) {
       throw messages.createError('error.emptyDefinitionFile');
+    }
+
+    const allowedFields: ReadonlySet<string> = new Set(['namespace', 'license', 'quantity']);
+    const unknownFields = [
+      ...new Set(definition.licenses.flatMap((entry) => Object.keys(entry).filter((key) => !allowedFields.has(key)))),
+    ];
+    if (unknownFields.length > 0) {
+      throw messages.createError('error.unsupportedDefinitionFileFields', [unknownFields.join(', ')]);
+    }
+
+    const requiredFields = ['namespace', 'license', 'quantity'] as const;
+    const missingFields = definition.licenses.flatMap((entry, index) =>
+      requiredFields
+        .filter((field) => entry[field] === undefined || entry[field] === null)
+        .map((field) => `licenses[${index}].${field}`)
+    );
+    if (missingFields.length > 0) {
+      throw messages.createError('error.missingRequiredDefinitionFileFields', [missingFields.join(', ')]);
     }
 
     return definition.licenses;
@@ -104,8 +139,8 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
 
     return [
       {
-        namespacePrefix: flags['namespace'] as string | undefined,
-        permissionSetLicense: flags['license'] as string,
+        namespace: flags['namespace'] as string | undefined,
+        license: flags['license'] as string,
         quantity: flags['quantity'] as number | undefined,
       },
     ];
@@ -117,11 +152,11 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
     const connection = flags['target-org'].getConnection(flags['api-version']);
 
     const licenseSpecs = flags['definition-file']
-      ? await LicenseProvision.loadSpecsFromFile(flags['definition-file'], flags)
+      ? await LicenseProvision.loadSpecsFromFile(flags['definition-file'])
       : LicenseProvision.buildSpecsFromFlags(flags);
 
     const endpoint = `/services/data/v${connection.getApiVersion()}/partnerdevelopment/permissionsetlicenses`;
-    const requestBody: ProvisionPslRequest = { licenses: licenseSpecs };
+    const requestBody: ProvisionPslRequest = { licenses: licenseSpecs.map(toApiSpec) };
 
     let response: ProvisionPslResponse;
     try {
