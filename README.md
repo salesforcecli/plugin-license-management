@@ -1,3 +1,7 @@
+<!-- TODO: Remove this template boilerplate (lines 1-43) and replace with actual plugin documentation before publishing. -->
+
+<!-- NOTE: Don't change anything in the <!- commands -> section below. That gets automatically replaced at the time of publish -->
+
 **NOTE: This template for sf plugins is not yet official. Please consult with the Platform CLI team before using this template.**
 
 # plugin-license-management

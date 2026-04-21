@@ -285,7 +285,7 @@ describe('license provision', () => {
       await LicenseProvision.run(['--target-org', testOrg.username, '--definition-file', tmpFilePath]);
       expect.fail('Expected an error to be thrown');
     } catch (error: unknown) {
-      expect((error as Error).message).to.include('Nonexistent fields: startDate, endDate');
+      expect((error as Error).message).to.include('Unknown fields in definition file: startDate, endDate');
     } finally {
       await unlink(tmpFilePath).catch(() => {});
     }

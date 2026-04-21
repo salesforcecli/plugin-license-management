@@ -1,13 +1,12 @@
 {
   "name": "@salesforce/plugin-license-management",
-  "description": "Manage Permission Set Licenses ",
+  "description": "Manage Permission Set Licenses",
   "version": "1.0.0",
   "author": "Salesforce",
   "bugs": "https://github.com/forcedotcom/cli/issues",
   "dependencies": {
     "@oclif/core": "^4",
     "@salesforce/core": "^8.28.1",
-    "@salesforce/kit": "^3.2.6",
     "@salesforce/sf-plugins-core": "^12"
   },
   "devDependencies": {

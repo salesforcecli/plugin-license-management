@@ -74,6 +74,8 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
   public static readonly flags = {
     'target-org': Flags.requiredOrg(),
     'api-version': Flags.orgApiVersion(),
+    // General question: If a definition-file is not passed, then are namespace, license, and quantity ALL required?
+    // Just confirming because you have a mix of `dependsOn` and `relationships: [{ type: 'all' ...`
     namespace: Flags.string({
       char: 'n',
       summary: messages.getMessage('flags.namespace.summary'),
@@ -89,11 +91,15 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
     quantity: Flags.integer({
       char: 'q',
       summary: messages.getMessage('flags.quantity.summary'),
+      // TODO: Should min be 1? Provisioning 0 licenses is a no-op.
       min: 0,
+      // You could also add a default so you didnt have to deal with `undefined`
       max: Number.MAX_SAFE_INTEGER,
       dependsOn: ['license'],
       exclusive: ['definition-file'],
     }),
+    // TODO: This should use `Flags.file({ exists: true })` instead of `Flags.string()`.
+    //       Otherwise your readFile will throw a raw ENOENT error for missing files.
     'definition-file': Flags.string({
       char: 'f',
       summary: messages.getMessage('flags.definition-file.summary'),
@@ -104,6 +110,8 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
   // Protected to allow stubbing in tests
   protected static async loadSpecsFromFile(filePath: string): Promise<ProvisionLicenseSpec[]> {
     const fileContent = await readFile(filePath, 'utf-8');
+    // TODO: Wrap JSON.parse in a try/catch so malformed JSON gives a user-friendly error
+    //       instead of a raw SyntaxError.
     const definition = JSON.parse(fileContent) as DefinitionFile;
 
     if (!Array.isArray(definition.licenses) || definition.licenses.length === 0) {
