@@ -22,14 +22,6 @@ Permission Set License name.
 
 Number of licenses to provision.
 
-# flags.start-date.summary
-
-License start date in YYYY-MM-DD format. Defaults to today.
-
-# flags.end-date.summary
-
-License end date in YYYY-MM-DD format. Default is no expiration.
-
 # flags.definition-file.summary
 
 Path to a JSON file that contains the PSL provisioning request information.
@@ -38,7 +30,7 @@ Path to a JSON file that contains the PSL provisioning request information.
 
 - Provision a single Permission Set License into an org:
 
-  <%= config.bin %> <%= command.id %> --target-org myScratchOrg --namespace demo --license newLicense --quantity 5 --start-date '2026-03-30' --end-date '2027-03-30'
+  <%= config.bin %> <%= command.id %> --target-org myScratchOrg --namespace demo --license newLicense --quantity 5
 
 - Use a JSON formatted input file to provision one or more Permission Set Licenses into an org:
 
@@ -52,13 +44,17 @@ Trace ID: %s
 
 Either --license or --definition-file is required.
 
-# error.mutuallyExclusiveFlags
-
-The --definition-file flag cannot be used with --namespace, --license, --quantity, --start-date, or --end-date.
-
 # error.emptyDefinitionFile
 
 The definition file must contain at least one license entry.
+
+# error.unsupportedDefinitionFileFields
+
+Nonexistent fields: %s
+
+# error.missingRequiredDefinitionFileFields
+
+Missing required fields: %s
 
 # error.provisionFailed
 

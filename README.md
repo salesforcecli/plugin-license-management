@@ -115,16 +115,15 @@ Provision Permission Set Licenses (PSL) into a target org.
 
 ```
 USAGE
-  $ sf license provision -o <value> [-n <value>] [-l <value>] [-q <value>] [-s <value>] [-e <value>] [-f <value>] [--api-version <value>] [--json] [--flags-dir <value>]
+  $ sf license provision -o <value> [-l <value> -n <value> -q <value>] [-f <value>] [--api-version <value>] [--json] [--flags-dir <value>]
 
 FLAGS
-  -e, --end-date=<value>         License end date in YYYY-MM-DD format. Default is no expiration.
   -f, --definition-file=<value>  Path to a JSON file that contains the PSL provisioning request information.
-  -l, --license=<value>          Permission Set License name.
-  -n, --namespace=<value>        License package namespace.
+                                 Cannot be combined with --license, --namespace, or --quantity.
+  -l, --license=<value>          Permission Set License name. Cannot be combined with --definition-file.
+  -n, --namespace=<value>        License package namespace. Requires --license. Cannot be combined with --definition-file.
   -o, --target-org=<value>       (required) Username or alias of the target org.
-  -q, --quantity=<value>         Number of licenses to provision.
-  -s, --start-date=<value>       License start date in YYYY-MM-DD format. Defaults to today.
+  -q, --quantity=<value>         Number of licenses to provision. Requires --license. Cannot be combined with --definition-file.
       --api-version=<value>      Override the api version used for api requests made by this command.
 
 GLOBAL FLAGS
@@ -136,41 +135,33 @@ DESCRIPTION
 
   There are two ways to run this command. You can provide the information to identify a single PSL via command line flags, or provision multiple PSLs in a single call by supplying a JSON formatted file.
 
-  See <Add URL Here> for the format and options contained within the JSON file.
+  The JSON definition file must contain a top-level `licenses` array. Each entry supports the following fields:
+
+  | Field | Type | Required | Description |
+  |---|---|---|---|
+  | `license` | string | Yes | Permission Set License name. |
+  | `namespace` | string | Yes | License package namespace. |
+  | `quantity` | integer | Yes | Number of licenses to provision. |
+
+  Example:
+
+  json
+  {
+    "licenses": [
+      { "namespace": "myNS", "license": "premiumLicense", "quantity": 10 },
+      { "namespace": "myNS", "license": "starterLicense", "quantity": 5 }
+    ]
+  }
 
 EXAMPLES
-  Provision a single Permission Set License into an org:
+Provision a single Permission Set License into an org:
 
-    $ sf license provision --target-org myScratchOrg --namespace demo --license newLicense --quantity 5 --start-date '2026-03-30' --end-date '2027-03-30'
+    $ sf license provision --target-org myScratchOrg --namespace demo --license newLicense --quantity 5
 
-  Use a JSON formatted input file to provision one or more Permission Set Licenses into an org:
+Use a JSON formatted input file to provision one or more Permission Set Licenses into an org:
 
     $ sf license provision --target-org myScratchOrg --definition-file test/config/provisionPSLs.json
 
-HUMAN READABLE OUTPUT
-
-  Success:
-  Provisioned 5 licenses for the license definition 'demo__newLicense'
-
-  Success:
-  Provisioned 5 licenses for the license definition 'demo__newLicense'
-  Provisioned 8 licenses for the license definition 'demo__premiumLicense'
-
-  Error: Failed to provision licenses.
-  License Definition not found for 'demo__badLicense'.
-  Quantity cannot be negative for 'demo__negativeLicense'.
-
-JSON OUTPUT
-
-  { "status": "success" }
-
-  {
-    "status": "error",
-    "messages": [
-      { "errorCode": "INVALID_LICENSE_DEFINITION", "message": "License definition not found for 'demo__badLicense'" },
-      { "errorCode": "INVALID_QUANTITY", "message": "Quantity cannot be negative for 'demo__negativeLicense'" }
-    ]
-  }
 ```
 
 _See code: [src/commands/license/provision.ts](https://github.com/salesforcecli/plugin-license-management/blob/1.0.0/src/commands/license/provision.ts)_
@@ -186,5 +177,5 @@ sf package install --package <package-id> --target-org <scratch-org-username>
 
 sf package install report -i <install-request-id> -o <scratch-org-username>
 
-sf license provision -o <scratch-org-username> --license premium --namespace demo --quantity 10 --start-date '2026-03-20' --end-date '2027-03-20'
+sf license provision -o <scratch-org-username> --license premium --namespace demo --quantity 10
 ```
