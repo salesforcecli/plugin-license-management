@@ -1,50 +1,13 @@
-**NOTE: This template for sf plugins is not yet official. Please consult with the Platform CLI team before using this template.**
-
-# plugin-license-management
+# License Management Plugin
 
 [![NPM](https://img.shields.io/npm/v/@salesforce/plugin-license-management.svg?label=@salesforce/plugin-license-management)](https://www.npmjs.com/package/@salesforce/plugin-license-management) [![Downloads/week](https://img.shields.io/npm/dw/@salesforce/plugin-license-management.svg)](https://npmjs.org/package/@salesforce/plugin-license-management) [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/license/apache-2-0)
 
-## Using the template
+Manage Permission Set Licenses (PSLs) in your scratch orgs. This plugin lets you provision PSL seats into a target scratch org — either one at a time via command line flags, or in bulk using a JSON definition file.
 
-This repository provides a template for creating a plugin for the Salesforce CLI. To convert this template to a working plugin:
+## Before You Begin
 
-1. Please get in touch with the Platform CLI team. We want to help you develop your plugin.
-2. Generate your plugin:
-
-   ```
-   sf plugins install dev
-   sf dev generate plugin
-
-   git init -b main
-   git add . && git commit -m "chore: initial commit"
-   ```
-
-3. Create your plugin's repo in the salesforcecli github org
-4. When you're ready, replace the contents of this README with the information you want.
-
-## Learn about `sf` plugins
-
-Salesforce CLI plugins are based on the [oclif plugin framework](https://oclif.io/docs/introduction). Read the [plugin developer guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_plugins.meta/sfdx_cli_plugins/cli_plugins_architecture_sf_cli.htm) to learn about Salesforce CLI plugin development.
-
-This repository contains a lot of additional scripts and tools to help with general Salesforce node development and enforce coding standards. You should familiarize yourself with some of the [node developer packages](#tooling) used by Salesforce. There is also a default circleci config using the [release management orb](https://github.com/forcedotcom/npm-release-management-orb) standards.
-
-Additionally, there are some additional tests that the Salesforce CLI will enforce if this plugin is ever bundled with the CLI. These test are included by default under the `posttest` script and it is required to keep these tests active in your plugin if you plan to have it bundled.
-
-### Tooling
-
-- [@salesforce/core](https://github.com/forcedotcom/sfdx-core)
-- [@salesforce/kit](https://github.com/forcedotcom/kit)
-- [@salesforce/sf-plugins-core](https://github.com/salesforcecli/sf-plugins-core)
-- [@salesforce/ts-types](https://github.com/forcedotcom/ts-types)
-- [@salesforce/ts-sinon](https://github.com/forcedotcom/ts-sinon)
-- [@salesforce/dev-config](https://github.com/forcedotcom/dev-config)
-- [@salesforce/dev-scripts](https://github.com/forcedotcom/dev-scripts)
-
-# Everything past here is only a suggestion as to what should be in your specific plugin's description
-
-This plugin is bundled with the [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli). For more information on the CLI, read the [getting started guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm).
-
-We always recommend using the latest version of these commands bundled with the CLI, however, you can install a specific version or tag if needed.
+- Install and authenticate the [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli).
+- Ensure you have the appropriate permissions to manage Permission Set Licenses in the target org.
 
 ## Install
 
@@ -170,12 +133,45 @@ _See code: [src/commands/license/provision.ts](https://github.com/salesforcecli/
 
 # Local Testing
 
+### 1. Log in to your Dev Hub
+
 ```bash
-sf org create scratch --target-dev-hub <devhub-alias> --definition-file test/config/scratch-org-def.json
+sf org login web --set-default-dev-hub --instance-url <dev-hub-url>
+```
 
-sf package install --package <package-id> --target-org <scratch-org-username>
+### 2. Create a scratch org
 
-sf package install report -i <install-request-id> -o <scratch-org-username>
+Before creating the scratch org, update `test/config/scratch-org-def.json` with your values:
 
-sf license provision -o <scratch-org-username> --license premium --namespace demo --quantity 10
+| Field       | Description                          |
+| ----------- | ------------------------------------ |
+| `orgName`   | Display name for the scratch org     |
+| `namespace` | Your package namespace (e.g. `myNS`) |
+
+```bash
+sf org create scratch --definition-file test/config/scratch-org-def.json --alias <scratch-org-alias>
+```
+
+### 3. Install the package into the scratch org
+
+Replace `<package-version-id>` with the 04t ID of the package version you want to test.
+
+```bash
+sf package install --package <package-version-id> --target-org <scratch-org-alias>
+```
+
+### 4. Open the scratch org (optional)
+
+```bash
+sf org open --target-org <scratch-org-alias>
+```
+
+### 5. Provision licenses
+
+```bash
+# Provision a single PSL
+sf license provision --target-org <scratch-org-alias> --namespace <namespace> --license <license-name> --quantity <number>
+
+# Provision multiple PSLs using a definition file
+sf license provision --target-org <scratch-org-alias> --definition-file <path-to-definition-file>
 ```

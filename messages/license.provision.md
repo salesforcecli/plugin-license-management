@@ -50,7 +50,11 @@ The definition file must contain at least one license entry.
 
 # error.unsupportedDefinitionFileFields
 
-Nonexistent fields: %s
+Unknown fields in definition file: %s
+
+# error.invalidDefinitionFileJson
+
+Definition file contains invalid JSON: %s
 
 # error.missingRequiredDefinitionFileFields
 

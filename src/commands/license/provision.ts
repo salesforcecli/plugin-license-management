@@ -28,7 +28,7 @@ type ProvisionLicenseSpec = {
 };
 
 type ApiLicenseSpec = {
-  namespacePrefix?: string;
+  namespace?: string;
   permissionSetLicense?: string;
   quantity?: number;
 };
@@ -60,7 +60,7 @@ function getLicenseDefinitionName(spec: ProvisionLicenseSpec): string {
 
 function toApiSpec(spec: ProvisionLicenseSpec): ApiLicenseSpec {
   return {
-    namespacePrefix: spec.namespace,
+    namespace: spec.namespace,
     permissionSetLicense: spec.license,
     quantity: spec.quantity,
   };
@@ -94,17 +94,23 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
       dependsOn: ['license'],
       exclusive: ['definition-file'],
     }),
-    'definition-file': Flags.string({
+    'definition-file': Flags.file({
       char: 'f',
       summary: messages.getMessage('flags.definition-file.summary'),
       exclusive: ['license', 'namespace', 'quantity'],
+      exists: true,
     }),
   };
 
   // Protected to allow stubbing in tests
   protected static async loadSpecsFromFile(filePath: string): Promise<ProvisionLicenseSpec[]> {
     const fileContent = await readFile(filePath, 'utf-8');
-    const definition = JSON.parse(fileContent) as DefinitionFile;
+    let definition: DefinitionFile;
+    try {
+      definition = JSON.parse(fileContent) as DefinitionFile;
+    } catch (e) {
+      throw messages.createError('error.invalidDefinitionFileJson', [(e as Error).message]);
+    }
 
     if (!Array.isArray(definition.licenses) || definition.licenses.length === 0) {
       throw messages.createError('error.emptyDefinitionFile');

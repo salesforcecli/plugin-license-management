@@ -107,7 +107,7 @@ describe('license provision', () => {
     const body = JSON.parse(callArgs.body) as { licenses: unknown[] };
     expect(body.licenses).to.have.length(1);
     expect(body.licenses[0]).to.deep.include({
-      namespacePrefix: 'demo',
+      namespace: 'demo',
       permissionSetLicense: 'newLicense',
       quantity: 5,
     });
@@ -285,7 +285,20 @@ describe('license provision', () => {
       await LicenseProvision.run(['--target-org', testOrg.username, '--definition-file', tmpFilePath]);
       expect.fail('Expected an error to be thrown');
     } catch (error: unknown) {
-      expect((error as Error).message).to.include('Nonexistent fields: startDate, endDate');
+      expect((error as Error).message).to.include('Unknown fields in definition file: startDate, endDate');
+    } finally {
+      await unlink(tmpFilePath).catch(() => {});
+    }
+  });
+
+  it('throws a user-friendly error when definition file contains invalid JSON', async () => {
+    const tmpFilePath = join(tmpdir(), `provision-malformed-${Date.now()}.json`);
+    await writeFile(tmpFilePath, '{ this is not valid json }');
+    try {
+      await LicenseProvision.run(['--target-org', testOrg.username, '--definition-file', tmpFilePath]);
+      expect.fail('Expected an error to be thrown');
+    } catch (error: unknown) {
+      expect((error as Error).message).to.include('invalid JSON');
     } finally {
       await unlink(tmpFilePath).catch(() => {});
     }
