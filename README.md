@@ -154,10 +154,18 @@ sf org create scratch --definition-file test/config/scratch-org-def.json --alias
 
 ### 3. Install the package into the scratch org
 
-Replace `<package-version-id>` with the 04t ID of the package version you want to test.
+Make the package available in the scratch org. Some ways to do this include:
+
+**Install a released package version**
 
 ```bash
 sf package install --package <package-version-id> --target-org <scratch-org-alias>
+```
+
+**Push source directly**
+
+```bash
+sf project deploy start --target-org <scratch-org-alias>
 ```
 
 ### 4. Open the scratch org (optional)
