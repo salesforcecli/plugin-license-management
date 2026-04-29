@@ -8,7 +8,7 @@ Provision Permission Set Licenses (PSL) into the target org. Successful executio
 
 There are two ways to run this command. You can provide the information to identify a single PSL via command line flags, or provision multiple PSLs in a single call by supplying a JSON formatted file.
 
-See <Add URL Here> for the format and options contained within the JSON file.
+See https://github.com/salesforcecli/plugin-license-management#sf-license-provision for the format and options contained within the JSON file.
 
 # flags.namespace.summary
 

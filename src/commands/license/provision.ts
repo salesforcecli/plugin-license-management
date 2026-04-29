@@ -77,8 +77,8 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
     namespace: Flags.string({
       char: 'n',
       summary: messages.getMessage('flags.namespace.summary'),
-      dependsOn: ['license'],
       exclusive: ['definition-file'],
+      relationships: [{ type: 'all', flags: ['license', 'quantity'] }],
     }),
     license: Flags.string({
       char: 'l',
@@ -91,8 +91,8 @@ export default class LicenseProvision extends SfCommand<LicenseProvisionResult> 
       summary: messages.getMessage('flags.quantity.summary'),
       min: 0,
       max: Number.MAX_SAFE_INTEGER,
-      dependsOn: ['license'],
       exclusive: ['definition-file'],
+      relationships: [{ type: 'all', flags: ['namespace', 'license'] }],
     }),
     'definition-file': Flags.file({
       char: 'f',
