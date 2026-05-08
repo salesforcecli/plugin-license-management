@@ -78,56 +78,45 @@ Provision Permission Set Licenses (PSL) into a target org.
 
 ```
 USAGE
-  $ sf license provision -o <value> [-l <value> -n <value> -q <value>] [-f <value>] [--api-version <value>] [--json] [--flags-dir <value>]
+  $ sf license provision -o <value> [--json] [--flags-dir <value>] [--api-version <value>] [-n <value> | -f <value>]
+    [-l <value> | ] [-q <value> | ]
 
 FLAGS
   -f, --definition-file=<value>  Path to a JSON file that contains the PSL provisioning request information.
-                                 Cannot be combined with --license, --namespace, or --quantity.
-  -l, --license=<value>          Permission Set License name. Cannot be combined with --definition-file.
-  -n, --namespace=<value>        License package namespace. Requires --license. Cannot be combined with --definition-file.
-  -o, --target-org=<value>       (required) Username or alias of the target org.
-  -q, --quantity=<value>         Number of licenses to provision. Requires --license. Cannot be combined with --definition-file.
-      --api-version=<value>      Override the api version used for api requests made by this command.
+  -l, --license=<value>          Permission Set License name.
+  -n, --namespace=<value>        License package namespace.
+  -o, --target-org=<value>       (required) Username or alias of the target org. Not required if the `target-org`
+                                 configuration variable is already set.
+  -q, --quantity=<value>         Number of licenses to provision.
+      --api-version=<value>      Override the api version used for api requests made by this command
 
 GLOBAL FLAGS
   --flags-dir=<value>  Import flag values from a directory.
   --json               Format output as json.
 
 DESCRIPTION
-  Provision Permission Set Licenses (PSL) into the target org. Successful execution sets the quantity of seats for the given PSL in the indicated org.
+  Provision Permission Set Licenses (PSL) into a target org.
 
-  There are two ways to run this command. You can provide the information to identify a single PSL via command line flags, or provision multiple PSLs in a single call by supplying a JSON formatted file.
+  Provision Permission Set Licenses (PSL) into the target org. Successful execution sets the quantity of seats for the
+  given PSL in the indicated org.
 
-  The JSON definition file must contain a top-level `licenses` array. Each entry supports the following fields:
+  There are two ways to run this command. You can provide the information to identify a single PSL via command line
+  flags, or provision multiple PSLs in a single call by supplying a JSON formatted file.
 
-  | Field | Type | Required | Description |
-  |---|---|---|---|
-  | `license` | string | Yes | Permission Set License name. |
-  | `namespace` | string | Yes | License package namespace. |
-  | `quantity` | integer | Yes | Number of licenses to provision. |
-
-  Example:
-
-  json
-  {
-    "licenses": [
-      { "namespace": "myNS", "license": "premiumLicense", "quantity": 10 },
-      { "namespace": "myNS", "license": "starterLicense", "quantity": 5 }
-    ]
-  }
+  See https://github.com/salesforcecli/plugin-license-management#sf-license-provision for the format and options
+  contained within the JSON file.
 
 EXAMPLES
-Provision a single Permission Set License into an org:
+  Provision a single Permission Set License into an org:
 
     $ sf license provision --target-org myScratchOrg --namespace demo --license newLicense --quantity 5
 
-Use a JSON formatted input file to provision one or more Permission Set Licenses into an org:
+  Use a JSON formatted input file to provision one or more Permission Set Licenses into an org:
 
     $ sf license provision --target-org myScratchOrg --definition-file test/config/provisionPSLs.json
-
 ```
 
-_See code: [src/commands/license/provision.ts](https://github.com/salesforcecli/plugin-license-management/blob/1.0.0/src/commands/license/provision.ts)_
+_See code: [src/commands/license/provision.ts](https://github.com/salesforcecli/plugin-license-management/blob/0.1.0/src/commands/license/provision.ts)_
 
 <!-- commandsstop -->
 
