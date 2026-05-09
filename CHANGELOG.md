@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/salesforcecli/plugin-license-management/compare/1.1.1...1.1.2) (2026-05-09)
+
+### Bug Fixes
+
+- **deps:** bump fast-xml-builder from 1.1.4 to 1.2.0 ([a7ced35](https://github.com/salesforcecli/plugin-license-management/commit/a7ced35e7d57eb6483a958128829287b69f9138d))
+
 ## [1.1.1](https://github.com/salesforcecli/plugin-license-management/compare/1.1.0...1.1.1) (2026-05-09)
 
 ### Bug Fixes
