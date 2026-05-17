@@ -116,7 +116,7 @@ EXAMPLES
     $ sf license provision --target-org myScratchOrg --definition-file test/config/provisionPSLs.json
 ```
 
-_See code: [src/commands/license/provision.ts](https://github.com/salesforcecli/plugin-license-management/blob/1.1.4/src/commands/license/provision.ts)_
+_See code: [src/commands/license/provision.ts](https://github.com/salesforcecli/plugin-license-management/blob/1.1.5/src/commands/license/provision.ts)_
 
 <!-- commandsstop -->
 
