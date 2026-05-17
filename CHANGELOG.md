@@ -1,3 +1,9 @@
+## [1.1.6](https://github.com/salesforcecli/plugin-license-management/compare/1.1.5...1.1.6) (2026-05-17)
+
+### Bug Fixes
+
+- **deps:** bump @oclif/core from 4.11.2 to 4.11.3 ([123a286](https://github.com/salesforcecli/plugin-license-management/commit/123a2865228d4c20036428270603fabf8129e2df))
+
 ## [1.1.5](https://github.com/salesforcecli/plugin-license-management/compare/1.1.4...1.1.5) (2026-05-17)
 
 ### Bug Fixes
