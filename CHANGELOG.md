@@ -1,3 +1,9 @@
+## [1.1.7](https://github.com/salesforcecli/plugin-license-management/compare/1.1.6...1.1.7) (2026-05-24)
+
+### Bug Fixes
+
+- **deps:** bump ws from 8.18.0 to 8.21.0 ([04d459a](https://github.com/salesforcecli/plugin-license-management/commit/04d459a70a222ca8b7a70d5e1d8c0f9d9f0a6478))
+
 ## [1.1.6](https://github.com/salesforcecli/plugin-license-management/compare/1.1.5...1.1.6) (2026-05-17)
 
 ### Bug Fixes
