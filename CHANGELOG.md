@@ -1,3 +1,9 @@
+## [1.1.14](https://github.com/salesforcecli/plugin-license-management/compare/1.1.13...1.1.14) (2026-06-17)
+
+### Bug Fixes
+
+- **deps:** bump @babel/core from 7.25.2 to 7.29.7 ([8cdc214](https://github.com/salesforcecli/plugin-license-management/commit/8cdc2140df315ea47a9739bdfbc54dc0c7aeec53))
+
 ## [1.1.13](https://github.com/salesforcecli/plugin-license-management/compare/1.1.12...1.1.13) (2026-06-17)
 
 ### Bug Fixes
