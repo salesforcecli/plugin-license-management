@@ -1,3 +1,9 @@
+## [1.1.13](https://github.com/salesforcecli/plugin-license-management/compare/1.1.12...1.1.13) (2026-06-17)
+
+### Bug Fixes
+
+- **deps:** bump form-data from 4.0.5 to 4.0.6 ([a09a006](https://github.com/salesforcecli/plugin-license-management/commit/a09a0064cfcff844a2c46cc8f3b7af270a4b8e3f))
+
 ## [1.1.12](https://github.com/salesforcecli/plugin-license-management/compare/1.1.11...1.1.12) (2026-06-17)
 
 ### Bug Fixes
