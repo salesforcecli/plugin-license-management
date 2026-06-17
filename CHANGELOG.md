@@ -1,3 +1,9 @@
+## [1.1.12](https://github.com/salesforcecli/plugin-license-management/compare/1.1.11...1.1.12) (2026-06-17)
+
+### Bug Fixes
+
+- **deps:** bump markdown-it from 14.1.0 to 14.2.0 ([c00f86b](https://github.com/salesforcecli/plugin-license-management/commit/c00f86b6601a980614c6e759094d13f818de029d))
+
 ## [1.1.11](https://github.com/salesforcecli/plugin-license-management/compare/1.1.10...1.1.11) (2026-06-14)
 
 ### Bug Fixes
