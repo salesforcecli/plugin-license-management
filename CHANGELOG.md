@@ -1,3 +1,9 @@
+## [1.1.21](https://github.com/salesforcecli/plugin-license-management/compare/1.1.20...1.1.21) (2026-07-17)
+
+### Bug Fixes
+
+- **deps:** bump websocket-driver from 0.7.4 to 0.7.5 ([0890dcb](https://github.com/salesforcecli/plugin-license-management/commit/0890dcbbbdb59045e31e59ac0c152503ad04f05d))
+
 ## [1.1.20](https://github.com/salesforcecli/plugin-license-management/compare/1.1.19...1.1.20) (2026-07-12)
 
 ### Bug Fixes
