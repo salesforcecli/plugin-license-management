@@ -1,3 +1,9 @@
+## [1.1.23](https://github.com/salesforcecli/plugin-license-management/compare/1.1.22...1.1.23) (2026-07-24)
+
+### Bug Fixes
+
+- **deps:** bump linkify-it from 5.0.1 to 5.0.2 ([aad4dd5](https://github.com/salesforcecli/plugin-license-management/commit/aad4dd57374014dfa721c0b6812fdb58ea9d19c8))
+
 ## [1.1.22](https://github.com/salesforcecli/plugin-license-management/compare/1.1.21...1.1.22) (2026-07-19)
 
 ### Bug Fixes
