@@ -1,3 +1,9 @@
+## [1.1.24](https://github.com/salesforcecli/plugin-license-management/compare/1.1.23...1.1.24) (2026-07-25)
+
+### Bug Fixes
+
+- **deps:** bump fast-uri from 3.1.2 to 3.1.4 ([8326c59](https://github.com/salesforcecli/plugin-license-management/commit/8326c59435eba60b1b3d2dc66d72256c804c91dd))
+
 ## [1.1.23](https://github.com/salesforcecli/plugin-license-management/compare/1.1.22...1.1.23) (2026-07-24)
 
 ### Bug Fixes
