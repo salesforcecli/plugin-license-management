@@ -1,3 +1,9 @@
+## [1.1.26](https://github.com/salesforcecli/plugin-license-management/compare/1.1.25...1.1.26) (2026-07-26)
+
+### Bug Fixes
+
+- **deps:** bump @salesforce/sf-plugins-core from 12.2.26 to 12.2.28 ([8328db2](https://github.com/salesforcecli/plugin-license-management/commit/8328db2ee50cd223c0c7159a0ea570ed885d36ef))
+
 ## [1.1.25](https://github.com/salesforcecli/plugin-license-management/compare/1.1.24...1.1.25) (2026-07-26)
 
 ### Bug Fixes
