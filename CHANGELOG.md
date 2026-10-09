@@ -1,3 +1,9 @@
+## [1.1.33](https://github.com/salesforcecli/plugin-license-management/compare/1.1.32...1.1.33) (2026-10-09)
+
+### Bug Fixes
+
+- **deps:** bump fast-copy from 3.0.2 to 3.1.0 ([ddd57b8](https://github.com/salesforcecli/plugin-license-management/commit/ddd57b856fbe07f5fbd356aefd5c82d758214765))
+
 ## [1.1.32](https://github.com/salesforcecli/plugin-license-management/compare/1.1.31...1.1.32) (2026-10-09)
 
 ### Bug Fixes
