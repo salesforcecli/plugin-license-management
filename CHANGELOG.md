@@ -1,3 +1,9 @@
+## [1.1.35](https://github.com/salesforcecli/plugin-license-management/compare/1.1.34...1.1.35) (2026-10-09)
+
+### Bug Fixes
+
+- **deps:** bump handlebars from 4.7.9 to 4.7.10 ([41f1b98](https://github.com/salesforcecli/plugin-license-management/commit/41f1b9871158fe9eac846487be44c403785db134))
+
 ## [1.1.34](https://github.com/salesforcecli/plugin-license-management/compare/1.1.33...1.1.34) (2026-10-09)
 
 ### Bug Fixes
