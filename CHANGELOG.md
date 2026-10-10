@@ -1,3 +1,9 @@
+## [1.1.36](https://github.com/salesforcecli/plugin-license-management/compare/1.1.35...1.1.36) (2026-10-10)
+
+### Bug Fixes
+
+- **deps:** bump baseline-browser-mapping from 2.10.37 to 2.11.22 ([d50d747](https://github.com/salesforcecli/plugin-license-management/commit/d50d747c7c755fd1c2ea1167bff9a8e5632febe0))
+
 ## [1.1.35](https://github.com/salesforcecli/plugin-license-management/compare/1.1.34...1.1.35) (2026-10-09)
 
 ### Bug Fixes
