@@ -1,3 +1,9 @@
+## [1.1.40](https://github.com/salesforcecli/plugin-license-management/compare/1.1.39...1.1.40) (2026-10-25)
+
+### Bug Fixes
+
+- **deps:** bump zod from 4.1.13 to 4.6.7 ([9d64926](https://github.com/salesforcecli/plugin-license-management/commit/9d64926294332ab261b17c1af4de239c26243b58))
+
 ## [1.1.39](https://github.com/salesforcecli/plugin-license-management/compare/1.1.38...1.1.39) (2026-10-25)
 
 ### Bug Fixes
