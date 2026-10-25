@@ -1,3 +1,9 @@
+## [1.1.41](https://github.com/salesforcecli/plugin-license-management/compare/1.1.40...1.1.41) (2026-10-25)
+
+### Bug Fixes
+
+- **deps:** bump undici from 8.11.2 to 8.12.3 ([0c86c12](https://github.com/salesforcecli/plugin-license-management/commit/0c86c12986eee871ebe724646aa7ebd1e870dd2d))
+
 ## [1.1.40](https://github.com/salesforcecli/plugin-license-management/compare/1.1.39...1.1.40) (2026-10-25)
 
 ### Bug Fixes
