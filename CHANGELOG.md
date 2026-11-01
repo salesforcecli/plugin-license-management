@@ -1,3 +1,9 @@
+## [1.1.42](https://github.com/salesforcecli/plugin-license-management/compare/1.1.41...1.1.42) (2026-11-01)
+
+### Bug Fixes
+
+- **deps:** bump brace-expansion from 1.1.11 to 1.1.21 ([038a611](https://github.com/salesforcecli/plugin-license-management/commit/038a611a6f4cf9d88b10a74bb9ef58b6c8c6c468))
+
 ## [1.1.41](https://github.com/salesforcecli/plugin-license-management/compare/1.1.40...1.1.41) (2026-10-25)
 
 ### Bug Fixes
