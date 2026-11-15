@@ -1,3 +1,9 @@
+## [1.1.43](https://github.com/salesforcecli/plugin-license-management/compare/1.1.42...1.1.43) (2026-11-15)
+
+### Bug Fixes
+
+- **deps:** bump js-yaml from 3.14.1 to 3.15.2 ([1ac678e](https://github.com/salesforcecli/plugin-license-management/commit/1ac678ead34cad5d101fa6d20ff455c4ac3238e0))
+
 ## [1.1.42](https://github.com/salesforcecli/plugin-license-management/compare/1.1.41...1.1.42) (2026-11-01)
 
 ### Bug Fixes
