@@ -1,3 +1,9 @@
+## [1.1.44](https://github.com/salesforcecli/plugin-license-management/compare/1.1.43...1.1.44) (2026-11-15)
+
+### Bug Fixes
+
+- **deps:** bump picomatch from 2.3.1 to 2.3.2 ([c7a3b51](https://github.com/salesforcecli/plugin-license-management/commit/c7a3b512bed7707e5529e2207f1cccb10e56d901))
+
 ## [1.1.43](https://github.com/salesforcecli/plugin-license-management/compare/1.1.42...1.1.43) (2026-11-15)
 
 ### Bug Fixes
